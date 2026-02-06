@@ -8,3 +8,14 @@ Book 1 Logical Foundations
 - poly
 - tactics
 - logic
+- IndProp
+- maps
+- ProofObjects
+- IndPrinciples
+- rel
+- imp✖️
+- impParser
+- impCEvalFun
+- extraction
+- auto
+- AltAuto
