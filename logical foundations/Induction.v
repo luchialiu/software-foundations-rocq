@@ -878,14 +878,36 @@ Abort.
     end of the [bin] and _only_ processes each bit only once. Do not
     try to "look ahead" at future bits. *)
 
-Fixpoint normalize (b:bin) : bin
-  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
+Fixpoint normalize (b:bin) : bin:=
+  match b with
+  | Z => Z
+  | B0 b' =>
+      match normalize b' with
+      | Z => Z
+      | b'' => B0 b''
+      end
+  | B1 b' => B1 (normalize b')
+  end.
 
 (** It would be wise to do some [Example] proofs to check that your definition of
     [normalize] works the way you intend before you proceed. They won't be graded,
     but fill them in below. *)
 
-(* FILL IN HERE *)
+Example normalize_ex1 :
+  normalize (B0 Z) = Z.
+Proof. reflexivity. Qed.
+
+Example normalize_ex2 :
+  normalize (B0 (B0 Z)) = Z.
+Proof. reflexivity. Qed.
+
+Example normalize_ex3 :
+  normalize (B1 (B0 Z)) = B1 Z.
+Proof. reflexivity. Qed.
+
+Example normalize_ex4 :
+  normalize (B0 (B1 Z)) = B0 (B1 Z).
+Proof. reflexivity. Qed.
 
 (** Finally, prove the main theorem. The inductive cases could be a
     bit tricky.
@@ -896,9 +918,39 @@ Fixpoint normalize (b:bin) : bin
     progress. We have one lemma for the [B0] case (which also makes
     use of [double_incr_bin]) and another for the [B1] case. *)
 
+Lemma nat_to_bin_double : forall n : nat,
+  nat_to_bin (double n) = double_bin (nat_to_bin n).
+Proof.
+  intros n.
+  induction n as [| n' IH].
+  - simpl. reflexivity.
+  - simpl.
+    rewrite double_incr_bin.
+    rewrite <- IH.
+    reflexivity.
+Qed.
+
 Theorem bin_nat_bin : forall b, nat_to_bin (bin_to_nat b) = normalize b.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros b.
+  induction b as [| b' IH | b' IH].
+  - (* Z *)
+    simpl. reflexivity.
+  - (* B0 *)
+    simpl.
+    rewrite <- double_plus.
+    rewrite nat_to_bin_double.
+    rewrite IH.
+    destruct (normalize b') eqn:E;
+    simpl; reflexivity.
+  - (* B1 *)
+    simpl.
+    rewrite <- double_plus.
+    rewrite nat_to_bin_double.
+    rewrite IH.
+    destruct (normalize b') eqn:E;
+    simpl; reflexivity.
+Qed.
 
 (** [] *)
 
